@@ -59,4 +59,27 @@ client.on("guildMemberRemove", (member) => {
     }
 });
 
+client.on("message", message => {
+    if (message.author.bot) return;
+    try {
+      console.log("try triggered by message");
+      let playerExists;
+      let playerIndex;
+      const playerData = JSON.parse(fs.readFileSync("./commands/players.json","utf8"));
+      playerData.map((players, index) => {
+        if (players.id !== message.member.id) {
+          return;
+        } else if (players.id === message.member.id) {
+          console.log("player id matches");
+          playerIndex = index;
+        }
+        console.log(playerData[playerIndex].points);
+        playerData[playerIndex].points += 1;
+        fs.writeFile("./commands/players.json", JSON.stringify(playerData), (err) => console.error);
+      })
+    } catch (err) {
+        console.error(err);
+    }
+});
+
 client.login(process.env.TOKEN);

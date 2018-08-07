@@ -23,9 +23,7 @@ exports.run = (client, message, args) => {
   console.log("message content " + message.content);
   if (args[0] === "join") {
     
-  
     playerData.map((players, index) => {
-      playerList.push(players.name);
       if (players.id === message.member.id) {
         playerExists = true;
         playerIndex = index;
@@ -34,22 +32,36 @@ exports.run = (client, message, args) => {
         playerExists = false;
       }
     })
-    console.log(playerIndex);
-    
-    console.log(playerList);
   
     if (playerExists === true) {
       message.channel.send(`You are already in the game as ${playerName} the ${playerData[playerIndex].class}`);
     } else if (playerExists !== true) {
     classSelection(message);
     }
+  } else if (args[0] === "rank") {
+    playerData.map((players, index) => {
+      if (players.id === message.member.id) {
+        playerExists = true;
+        playerIndex = index;
+        return index;
+      } else {
+        playerExists = false; 
+      }
+    })
+    
+    if (playerExists === true) {
+      message.channel.send(`You are level ${playerData[playerIndex].level} with ${playerData[playerIndex].points} points`); 
+    } else if (playerExists !== true) {
+      message.channel.send("You are not registered yet! Type !game join to begin your journey!");
+    }
   }
-
+                   
+                   
 
 function classSelection (message) {
   message.channel.send("please select your class from the following choices. barbarian, bard, cleric, druid, fighter, monk, paladin, ranger, rogue, sorcerer, warlock, wizard");
   // I may be able to shorten this by just making the filter a message from the author. but that may also run with the trigger as well...
-  const classFilter = message => (message.content.includes("barbarian") || message.content.includes("bard") || message.content.includes("cleric") || message.content.includes("druid") || message.content.includes("fighter") || message.content.includes("monk") || message.content.includes("paladin") || message.content.includes("ranger") || message.content.includes("rogue") || message.content.includes("sorcerer") || message.content.includes("warlock") || message.content.includes("wizard")) && (message.author.bot == false) && (message.member.id === playerId);
+  const classFilter = message => (message.content.includes(/barbarian/i) || message.content.includes("bard") || message.content.includes("cleric") || message.content.includes("druid") || message.content.includes(/fighter/i) || message.content.includes("monk") || message.content.includes("paladin") || message.content.includes("ranger") || message.content.includes("rogue") || message.content.includes("sorcerer") || message.content.includes("warlock") || message.content.includes("wizard")) && (message.author.bot == false) && (message.member.id === playerId);
 
   const collector = message.channel.createMessageCollector(classFilter, {maxMatches: 1,  time: 15000 });
     collector.on('collect', message => {
